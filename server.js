@@ -1,30 +1,15 @@
-const express = require('express');
-const app = express();
+module.exports = (req, res) => {
+  const path = req.url.slice(1); // Remove leading slash
 
-// Redirect based on path
-app.get('/:target', (req, res) => {
-  const target = req.params.target;
-  let redirectUrl = '';
-
-  // Define redirects based on path
-  if (target === 'google.com') {
-    redirectUrl = 'https://www.google.com';
-  } else if (target === 'github.com') {
-    redirectUrl = 'https://github.com';
-  } else {
-    redirectUrl = `https://${target}`;
+  // If root, show message or redirect somewhere
+  if (!path) {
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).end('<h1>Redirect Service</h1><p>Use /your-url to redirect.</p>');
+    return;
   }
 
-  // Redirect to the desired URL
-  res.redirect(301, redirectUrl);
-});
-
-// Serve index.html for root requests
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-// Start server
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
+  // Redirect to the given path
+  const targetUrl = `https://${path}`;
+  res.writeHead(302, { Location: targetUrl });
+  res.end();
+};
